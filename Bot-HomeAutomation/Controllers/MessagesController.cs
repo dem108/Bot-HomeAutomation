@@ -14,6 +14,9 @@ namespace Bot_HomeAutomation
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
         /// </summary>
+        /// 
+
+        /*
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
             if (activity.Type == ActivityTypes.Message)
@@ -27,6 +30,22 @@ namespace Bot_HomeAutomation
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
+        */
+
+        public virtual async Task<HttpResponseMessage> Post([FromBody] Activity activity)
+        {
+            // Check if activity is of type message
+            if (activity != null && activity.GetActivityType() == ActivityTypes.Message)
+            {
+                await Conversation.SendAsync(activity, () => new Dialogs.EchoDialog());
+            }
+            else
+            {
+                HandleSystemMessage(activity);
+            }
+            return new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
+        }
+
 
         private Activity HandleSystemMessage(Activity message)
         {
