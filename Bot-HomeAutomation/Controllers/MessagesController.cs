@@ -16,7 +16,7 @@ namespace Bot_HomeAutomation
         /// </summary>
         /// 
 
-        /*
+        
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
             if (activity.Type == ActivityTypes.Message)
@@ -30,8 +30,8 @@ namespace Bot_HomeAutomation
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
-        */
-
+        
+        /*
         public virtual async Task<HttpResponseMessage> Post([FromBody] Activity activity)
         {
             // Check if activity is of type message
@@ -45,7 +45,7 @@ namespace Bot_HomeAutomation
             }
             return new HttpResponseMessage(System.Net.HttpStatusCode.Accepted);
         }
-
+        */
 
         private Activity HandleSystemMessage(Activity message)
         {
