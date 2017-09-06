@@ -27,7 +27,7 @@ namespace Bot_HomeAutomation.Dialogs
         public LuisBaseDialog()
         {
             _deviceControlHelper = new DeviceControlHelper();
-            _iotDeviceId = "homehub-02";
+            _iotDeviceId = "homehub-01";
         }
 
         [LuisIntent("")]
@@ -156,6 +156,9 @@ namespace Bot_HomeAutomation.Dialogs
                 await context.PostAsync($"deviceId={deviceModel.DeviceId}");
                 await context.PostAsync($"time={deviceModel.Time}");
                 await context.PostAsync($"location=long:{deviceModel.Location.Longitude},lat:{deviceModel.Location.Latitude}");
+                await context.PostAsync($"temperature={deviceModel.Temperature}");
+                await context.PostAsync($"humidity={deviceModel.Humidity}");
+                await context.PostAsync($"forecast={deviceModel.Forecast}");
 
                 foreach (VirtualDeviceElement element in deviceModel.Elements)
                 {
@@ -165,6 +168,8 @@ namespace Bot_HomeAutomation.Dialogs
                     await context.PostAsync($"PowerConsumptionValue={element.PowerConsumptionValue}");
                     
                 }
+
+                //Power Consumption is always 0???
                 
             }
             catch (Exception e)

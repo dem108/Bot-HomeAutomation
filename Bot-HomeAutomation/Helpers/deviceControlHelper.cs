@@ -102,12 +102,21 @@ namespace Bot_HomeAutomation.Helpers
                     var key = item.Key;
                     var value = item.Value;
 
+                    //
+                    await context.PostAsync($"key={key}, value={value}");
+
+
                     if (item.Key == "result")
                     {
                         deviceModel = JsonConvert.DeserializeObject<DeviceModel>((string)item.Value);
                         //await context.PostAsync($"deviceId={deviceModelParsed.DeviceId}, time={deviceModelParsed.Time}");
                     }
                 }
+
+            }
+            catch (NullReferenceException e)
+            {
+                await context.PostAsync($"Check if the bot is trying to talk with operational device: {e.ToString()}");
 
             }
             catch (Exception e)
