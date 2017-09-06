@@ -9,7 +9,7 @@ namespace HomeAutomationWebAPI.Models
         public string DeviceId { get; set; }
         public DateTime Time { get; set; }
         public Location Location { get; set; }
-        public List<dynamic> Elements { get; set; }
+        public List<VirtualDeviceElement> Elements { get; set; }
         public string ToJsonString(Formatting formatting) => JsonConvert.SerializeObject(this, formatting);
     }
 }

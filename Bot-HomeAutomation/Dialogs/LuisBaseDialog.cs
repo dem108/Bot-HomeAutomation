@@ -43,7 +43,7 @@ namespace Bot_HomeAutomation.Dialogs
             return result;            
         }
 
-        static async void ControlDeviceSwitch(string deviceID, ElementType elementType, SwitchStatus switchStatus)
+        static async void ControlDeviceSwitchAsync(string deviceID, ElementType elementType, SwitchStatus switchStatus)
         {
 
             httpclient = new HttpClient
@@ -60,7 +60,7 @@ namespace Bot_HomeAutomation.Dialogs
             string result = await PostDeviceElementSwitchAsync("api/deviceElement/setdeviceelementswitch", deviceElementSwitch);    
         }
 
-        static async Task<string> GetTemperature(string deviceId)
+        static async Task<string> GetTemperatureAsync(string deviceId)
         {
             httpclient = new HttpClient
             {
@@ -70,7 +70,7 @@ namespace Bot_HomeAutomation.Dialogs
             string temperature = await GetAsync($"api/deviceElement/Temperature?deviceId={deviceId}");
             return temperature;
         }
-        static async Task<string> GetHumidity(string deviceId)
+        static async Task<string> GetHumidityAsync(string deviceId)
         {
             httpclient = new HttpClient
             {
@@ -81,34 +81,19 @@ namespace Bot_HomeAutomation.Dialogs
             return temperature;
         }
 
-
-
-        public class StatusMessage
-        {
-            public string time;
-            public int statusCode;
-            public string resultJson;
-            
-        }
         
-
-        static async void ReadDeviceStatus(string deviceId, IDialogContext context)
+        static async Task<DeviceModel> ReadDeviceStatusAsync(string deviceId, IDialogContext context)
         {
             httpclient = new HttpClient
             {
                 BaseAddress = new Uri(iotPlatformApiBaseAddress)
             };
 
-            StatusMessage statusMessage;
-
-            DeviceModel deviceModel;
-
             var response = await httpclient.GetAsync($"api/deviceElement/ReadDeviceStatus?deviceId={deviceId}");
             var parsed = JObject.Parse(await response.Content.ReadAsStringAsync());
 
-            List<object> myList = new List<object>();
-
-            await context.PostAsync("ReadDeviceStatus starts.");
+            DeviceModel deviceModel = new DeviceModel();
+            //CHECK: leak
 
             try
             {
@@ -119,23 +104,21 @@ namespace Bot_HomeAutomation.Dialogs
 
                     if (item.Key == "result")
                     {
-                        var deviceModelParsed = JsonConvert.DeserializeObject<DeviceModel>((string)item.Value);
-                        await context.PostAsync($"deviceId={deviceModelParsed.DeviceId}, time={deviceModelParsed.Time}");
-
+                        deviceModel = JsonConvert.DeserializeObject<DeviceModel>((string)item.Value);
+                        //await context.PostAsync($"deviceId={deviceModelParsed.DeviceId}, time={deviceModelParsed.Time}");
                     }
                 }
 
             }
             catch (Exception e)
             {
-                await context.PostAsync(e.ToString());
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
             }
 
-            return;
+            return deviceModel;
         }
 
         
-
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -162,7 +145,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchCoolerOff: Turning off the Cooler...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitch(iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
+            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
 
             context.Wait(this.MessageReceived);
         }
@@ -173,7 +156,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchCoolerOn: Turning on the Cooler...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitch(iotDeviceId, ElementType.Cooler, SwitchStatus.On);
+            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Cooler, SwitchStatus.On);
 
             context.Wait(this.MessageReceived);
         }
@@ -185,7 +168,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchHeaterOff: Turning off the Heater...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitch(iotDeviceId, ElementType.Heater, SwitchStatus.Off);
+            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Heater, SwitchStatus.Off);
 
             context.Wait(this.MessageReceived);
         }
@@ -196,7 +179,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchHeaterOn: Turning on the Heater...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitch(iotDeviceId, ElementType.Heater, SwitchStatus.On);
+            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Heater, SwitchStatus.On);
 
             context.Wait(this.MessageReceived);
         }
@@ -209,7 +192,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchLightOff: Turning off the Light...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitch(iotDeviceId, ElementType.Light, SwitchStatus.Off);
+            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Light, SwitchStatus.Off);
 
             context.Wait(this.MessageReceived);
         }
@@ -220,7 +203,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchLightOn: Turning on the Light...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitch(iotDeviceId, ElementType.Light, SwitchStatus.On);
+            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Light, SwitchStatus.On);
 
             context.Wait(this.MessageReceived);
         }
@@ -231,7 +214,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"GetTemperature.";
             await context.PostAsync(message);
 
-            await context.PostAsync(await GetTemperature(iotDeviceId));
+            await context.PostAsync(await GetTemperatureAsync(iotDeviceId));
 
             context.Wait(this.MessageReceived);
         }
@@ -242,7 +225,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"GetHumidity.";
             await context.PostAsync(message);
 
-            await context.PostAsync(await GetHumidity(iotDeviceId));
+            await context.PostAsync(await GetHumidityAsync(iotDeviceId));
 
             context.Wait(this.MessageReceived);
         }
@@ -253,36 +236,36 @@ namespace Bot_HomeAutomation.Dialogs
         {
             string message = $"GetDeviceStatus.";
             await context.PostAsync(message);
-            double value = -100;
 
             //DeviceModel deviceStatus = 
             //await 
-            ReadDeviceStatus(iotDeviceId, context);
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(iotDeviceId, context);
 
-            /*
-            foreach (VirtualDeviceElement deviceElement in deviceStatus.Elements)
+            try
             {
-                await context.PostAsync($"ElementType: {deviceElement.ElementType}");
-                await context.PostAsync($"SetValue: {deviceElement.SetValue}");
+                await context.PostAsync($"deviceId={deviceModel.DeviceId}");
+                await context.PostAsync($"time={deviceModel.Time}");
+                await context.PostAsync($"location=long:{deviceModel.Location.Longitude},lat:{deviceModel.Location.Latitude}");
 
-                if (deviceElement.ElementType == ElementType.Temperature)
+                foreach (VirtualDeviceElement element in deviceModel.Elements)
                 {
-                    value = deviceElement.SetValue;
+                    await context.PostAsync($"elementType={element.ElementType}");
+                    await context.PostAsync($"SwitchStatus={element.SwitchStatus}");
+                    await context.PostAsync($"SetValue={element.SetValue}");
+                    await context.PostAsync($"PowerConsumptionValue={element.PowerConsumptionValue}");
+                    
                 }
+                
             }
-            await context.PostAsync($"Value is now {value}.");
-            
-
-            if (deviceStatus != null)
-                await context.PostAsync($"deviceStatus: {deviceStatus.ToString()}.");
-            else
-                await context.PostAsync("couldn't get deviceStatus.");
-            */
-
+            catch (Exception e)
+            {
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+            }
+ 
 
             context.Wait(this.MessageReceived);
         }
-        
+
 
     }
 

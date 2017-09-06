@@ -37,10 +37,16 @@ namespace Bot_HomeAutomation.Dialogs
             //http://adaptivecards.io/visualizer/?card=/samples/cards/Weather%20Compact.json
             //but will need to get weather info from somewhere. 
 
-            Activity replyToConversation = activity.CreateReply("");
-            replyToConversation.Attachments = new List<Attachment>();
 
-            
+            await context.PostAsync(InitializeWelcomeMessageAsync(activity));
+
+            context.Call(new LuisBaseDialog(), this.MessageReceivedAsync);
+
+        }
+
+        static Activity InitializeWelcomeMessageAsync(Activity activity)
+        {
+
             List<CardAction> cardButtons = new List<CardAction>
             {
                 new CardAction()
@@ -54,6 +60,48 @@ namespace Bot_HomeAutomation.Dialogs
                     Title = "Light Off",
                     Type = "imBack",
                     Value = "Turn off the light"
+                },
+                new CardAction()
+                {
+                    Title = "Heater On",
+                    Type = "imBack",
+                    Value = "Turn on the heater"
+                },
+                new CardAction()
+                {
+                    Title = "Heater Off",
+                    Type = "imBack",
+                    Value = "Turn off the heater"
+                },
+                new CardAction()
+                {
+                    Title = "Cooler On",
+                    Type = "imBack",
+                    Value = "Turn on the coolor"
+                },
+                new CardAction()
+                {
+                    Title = "Cooler Off",
+                    Type = "imBack",
+                    Value = "Turn off the cooler"
+                },
+                new CardAction()
+                {
+                    Title = "Get Humidity",
+                    Type = "imBack",
+                    Value = "How is the humididy?"
+                },
+                new CardAction()
+                {
+                    Title = "Get Temperature",
+                    Type = "imBack",
+                    Value = "How is the temperature?"
+                },
+                new CardAction()
+                {
+                    Title = "Check Device Status",
+                    Type = "imBack",
+                    Value = "Status report"
                 }
             };
 
@@ -73,14 +121,14 @@ namespace Bot_HomeAutomation.Dialogs
                 Buttons = cardButtons
             };
 
-            Attachment attachment = card.ToAttachment();
 
-            replyToConversation.Attachments.Add(attachment);
+            Activity replyToConversation = activity.CreateReply("");
+            replyToConversation.Attachments = new List<Attachment>
+            {
+                card.ToAttachment()
+            };
 
-            await context.PostAsync(replyToConversation);
-
-            context.Call(new LuisBaseDialog(), this.MessageReceivedAsync);
-
+            return replyToConversation;
         }
     }
 }
