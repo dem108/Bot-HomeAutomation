@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 
-namespace HomeAutomationPlatformAPI.Models { 
+namespace HomeAutomationWebAPI.Models
+{
     public class VirtualDeviceElement
     {
         public VirtualDeviceElement(double maxPowerConsumption, ElementType elementType)
@@ -15,7 +16,7 @@ namespace HomeAutomationPlatformAPI.Models {
         {
             return _random.NextDouble() * (maximum - minimum) + minimum;
         }
-
+        
         public DeviceElementModel ValueReadings()
         {
             var values = new DeviceElementModel

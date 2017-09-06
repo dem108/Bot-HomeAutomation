@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text;
-using HomeAutomationPlatformAPI.Models;
+using HomeAutomationWebAPI.Models;
 
 namespace Bot_HomeAutomation.Dialogs
 {
@@ -119,17 +119,6 @@ namespace Bot_HomeAutomation.Dialogs
 
                     if (item.Key == "result")
                     {
-
-
-                        var innerJObject = item.Value;
-                        var resultArray = JObject.Parse((string)innerJObject);
-                        foreach (var resultItem in resultArray)
-                        {
-                            await context.PostAsync($"key:{resultItem.Key}, value:{resultItem.Value}");
-                        }
-
-                        await context.PostAsync("Trying deserialization.");
-
                         var deviceModelParsed = JsonConvert.DeserializeObject<DeviceModel>((string)item.Value);
                         await context.PostAsync($"deviceId={deviceModelParsed.DeviceId}, time={deviceModelParsed.Time}");
 

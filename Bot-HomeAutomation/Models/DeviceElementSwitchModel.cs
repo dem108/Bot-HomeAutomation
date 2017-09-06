@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace HomeAutomationWebAPI.Models
 {
-    public class DeviceElementModel
+    public class DeviceElementSwitchModel
     {
+        public string DeviceId;
         public ElementType ElementType { get; set; }
         public SwitchStatus SwitchStatus { get; set; }
-        public double SetValue { get; set; }
-        public double PowerConsumptionValue { get; set; }
         public string ToJsonString(Formatting formatting) => JsonConvert.SerializeObject(this, formatting);
     }
 }

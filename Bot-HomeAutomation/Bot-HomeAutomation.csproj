@@ -157,6 +157,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\DeviceElementModel.cs" />
+    <Compile Include="Models\DeviceElementSwitchModel.cs" />
+    <Compile Include="Models\DeviceElementValueModel.cs" />
+    <Compile Include="Models\DeviceModel.cs" />
+    <Compile Include="Models\ElementType.cs" />
+    <Compile Include="Models\Location.cs" />
+    <Compile Include="Models\SwitchStatus.cs" />
     <Compile Include="Models\VirtualDeviceElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
