@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text;
 using HomeAutomationWebAPI.Models;
+using Bot_HomeAutomation.Helpers;
 
 namespace Bot_HomeAutomation.Dialogs
 {
@@ -19,106 +20,15 @@ namespace Bot_HomeAutomation.Dialogs
     [Serializable]
     public class LuisBaseDialog : LuisDialog<object>
     {
-        static HttpClient httpclient;
-        static public string iotDeviceId = "homehub-02";
-        static public string iotPlatformApiBaseAddress = "http://homeautomationwebapi.azurewebsites.net/";
-        //static public string iotPlatformApiBaseAddress = "http://localhost:58675/";
+        private DeviceControlHelper _deviceControlHelper;
+        private string _iotDeviceId;
 
 
-        //static void PostAsync(string requestUri, DeviceElementStatus control)
-        static async Task<string> PostDeviceElementSwitchAsync(string requestUri, DeviceElementSwitchModel control)
+        public LuisBaseDialog()
         {
-            var content = JsonConvert.SerializeObject(control);
-            var response = await httpclient.PostAsync(requestUri, new StringContent(content, Encoding.UTF8, "application/json"));
-            string result = response.Content.ReadAsStringAsync().Result;
-
-            return result;
+            _deviceControlHelper = new DeviceControlHelper();
+            _iotDeviceId = "homehub-02";
         }
-
-        static async Task<string> GetAsync(string requestUri)
-        {
-            var response = await httpclient.GetAsync(requestUri);
-            string result = response.Content.ReadAsStringAsync().Result;
-
-            return result;            
-        }
-
-        static async void ControlDeviceSwitchAsync(string deviceID, ElementType elementType, SwitchStatus switchStatus)
-        {
-
-            httpclient = new HttpClient
-            {
-                BaseAddress = new Uri(iotPlatformApiBaseAddress)
-            };
-
-            var deviceElementSwitch = new DeviceElementSwitchModel
-            {
-                DeviceId = deviceID,
-                ElementType = elementType,
-                SwitchStatus = switchStatus
-            };
-            string result = await PostDeviceElementSwitchAsync("api/deviceElement/setdeviceelementswitch", deviceElementSwitch);    
-        }
-
-        static async Task<string> GetTemperatureAsync(string deviceId)
-        {
-            httpclient = new HttpClient
-            {
-                BaseAddress = new Uri(iotPlatformApiBaseAddress)
-            };
-
-            string temperature = await GetAsync($"api/deviceElement/Temperature?deviceId={deviceId}");
-            return temperature;
-        }
-        static async Task<string> GetHumidityAsync(string deviceId)
-        {
-            httpclient = new HttpClient
-            {
-                BaseAddress = new Uri(iotPlatformApiBaseAddress)
-            };
-
-            string temperature = await GetAsync($"api/deviceElement/Humidity?deviceId={deviceId}");
-            return temperature;
-        }
-
-        
-        static async Task<DeviceModel> ReadDeviceStatusAsync(string deviceId, IDialogContext context)
-        {
-            httpclient = new HttpClient
-            {
-                BaseAddress = new Uri(iotPlatformApiBaseAddress)
-            };
-
-            var response = await httpclient.GetAsync($"api/deviceElement/ReadDeviceStatus?deviceId={deviceId}");
-            var parsed = JObject.Parse(await response.Content.ReadAsStringAsync());
-
-            DeviceModel deviceModel = new DeviceModel();
-            //CHECK: leak
-
-            try
-            {
-                foreach (var item in parsed)
-                {
-                    var key = item.Key;
-                    var value = item.Value;
-
-                    if (item.Key == "result")
-                    {
-                        deviceModel = JsonConvert.DeserializeObject<DeviceModel>((string)item.Value);
-                        //await context.PostAsync($"deviceId={deviceModelParsed.DeviceId}, time={deviceModelParsed.Time}");
-                    }
-                }
-
-            }
-            catch (Exception e)
-            {
-                await context.PostAsync($"Bot needs some care: {e.ToString()}");
-            }
-
-            return deviceModel;
-        }
-
-        
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -145,7 +55,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchCoolerOff: Turning off the Cooler...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
+            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
 
             context.Wait(this.MessageReceived);
         }
@@ -156,7 +66,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchCoolerOn: Turning on the Cooler...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Cooler, SwitchStatus.On);
+            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.On);
 
             context.Wait(this.MessageReceived);
         }
@@ -168,7 +78,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchHeaterOff: Turning off the Heater...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Heater, SwitchStatus.Off);
+            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.Off);
 
             context.Wait(this.MessageReceived);
         }
@@ -179,7 +89,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchHeaterOn: Turning on the Heater...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Heater, SwitchStatus.On);
+            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.On);
 
             context.Wait(this.MessageReceived);
         }
@@ -192,7 +102,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchLightOff: Turning off the Light...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Light, SwitchStatus.Off);
+            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.Off);
 
             context.Wait(this.MessageReceived);
         }
@@ -203,7 +113,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"SwitchLightOn: Turning on the Light...";
             await context.PostAsync(message);
 
-            ControlDeviceSwitchAsync(iotDeviceId, ElementType.Light, SwitchStatus.On);
+            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.On);
 
             context.Wait(this.MessageReceived);
         }
@@ -214,7 +124,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"GetTemperature.";
             await context.PostAsync(message);
 
-            await context.PostAsync(await GetTemperatureAsync(iotDeviceId));
+            await context.PostAsync(await _deviceControlHelper.GetTemperatureAsync(_iotDeviceId));
 
             context.Wait(this.MessageReceived);
         }
@@ -225,7 +135,7 @@ namespace Bot_HomeAutomation.Dialogs
             string message = $"GetHumidity.";
             await context.PostAsync(message);
 
-            await context.PostAsync(await GetHumidityAsync(iotDeviceId));
+            await context.PostAsync(await _deviceControlHelper.GetHumidityAsync(_iotDeviceId));
 
             context.Wait(this.MessageReceived);
         }
@@ -239,7 +149,7 @@ namespace Bot_HomeAutomation.Dialogs
 
             //DeviceModel deviceStatus = 
             //await 
-            DeviceModel deviceModel = await ReadDeviceStatusAsync(iotDeviceId, context);
+            DeviceModel deviceModel = await _deviceControlHelper.ReadDeviceStatusAsync(_iotDeviceId, context);
 
             try
             {
