@@ -58,7 +58,7 @@ namespace Bot_HomeAutomation.Dialogs
             if (_DEBUG) await context.PostAsync($"SwitchCoolerOff: Turning off the Cooler...");
 
             string callResult = "";
-            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(context, _iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
 
             if (_DEBUG) await context.PostAsync(callResult);
 
@@ -71,7 +71,7 @@ namespace Bot_HomeAutomation.Dialogs
             if (_DEBUG) await context.PostAsync($"SwitchCoolerOn: Turning on the Cooler...");
 
             string callResult = "";
-            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.On);
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(context, _iotDeviceId, ElementType.Cooler, SwitchStatus.On);
 
             if (_DEBUG) await context.PostAsync(callResult);
 
@@ -85,7 +85,7 @@ namespace Bot_HomeAutomation.Dialogs
             if (_DEBUG) await context.PostAsync($"SwitchHeaterOff: Turning off the Heater...");
 
             string callResult = "";
-            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.Off);
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(context, _iotDeviceId, ElementType.Heater, SwitchStatus.Off);
 
             if (_DEBUG) await context.PostAsync(callResult);
 
@@ -98,7 +98,7 @@ namespace Bot_HomeAutomation.Dialogs
             if (_DEBUG) await context.PostAsync($"SwitchHeaterOn: Turning on the Heater...");
 
             string callResult = "";
-            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.On);
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(context, _iotDeviceId, ElementType.Heater, SwitchStatus.On);
 
             if (_DEBUG) await context.PostAsync(callResult);
 
@@ -113,7 +113,7 @@ namespace Bot_HomeAutomation.Dialogs
             if (_DEBUG) await context.PostAsync($"SwitchLightOff: Turning off the Light...");
 
             string callResult = "";
-            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.Off);
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(context, _iotDeviceId, ElementType.Light, SwitchStatus.Off);
 
             if (_DEBUG) await context.PostAsync(callResult);
 
@@ -126,7 +126,7 @@ namespace Bot_HomeAutomation.Dialogs
             if (_DEBUG) await context.PostAsync($"SwitchLightOn: Turning on the Light...");
 
             string callResult = "";
-            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.On);
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(context, _iotDeviceId, ElementType.Light, SwitchStatus.On);
 
             if (_DEBUG) await context.PostAsync(callResult);
 
@@ -142,7 +142,7 @@ namespace Bot_HomeAutomation.Dialogs
 
             try
             {
-                temperature = await _deviceControlHelper.GetTemperatureAsync(_iotDeviceId, context);
+                temperature = await _deviceControlHelper.GetTemperatureAsync(context, _iotDeviceId);
             }
             catch (NullReferenceException e)
             {
@@ -174,7 +174,7 @@ namespace Bot_HomeAutomation.Dialogs
             
             try
             {
-                humidity = await _deviceControlHelper.GetHumidityAsync(_iotDeviceId, context);
+                humidity = await _deviceControlHelper.GetHumidityAsync(context, _iotDeviceId);
             }
             catch (NullReferenceException e)
             {
@@ -206,7 +206,7 @@ namespace Bot_HomeAutomation.Dialogs
 
             try
             {
-                probabilityRain = await _deviceControlHelper.GetRainForecastAsync(_iotDeviceId, context);
+                probabilityRain = await _deviceControlHelper.GetRainForecastAsync(context, _iotDeviceId);
             }
             catch (NullReferenceException e)
             {
@@ -236,7 +236,7 @@ namespace Bot_HomeAutomation.Dialogs
 
             //DeviceModel deviceStatus = 
             //await 
-            DeviceModel deviceModel = await _deviceControlHelper.ReadDeviceStatusAsync(_iotDeviceId, context);
+            DeviceModel deviceModel = await _deviceControlHelper.ReadDeviceStatusAsync(context, _iotDeviceId);
 
             try
             {
@@ -270,7 +270,7 @@ namespace Bot_HomeAutomation.Dialogs
 
             try
             {
-                string resultCapture = await _deviceControlHelper.CaptureImageAsync(_iotDeviceId);
+                string resultCapture = await _deviceControlHelper.CaptureImageAsync(context, _iotDeviceId);
                 if (_DEBUG) await context.PostAsync(resultCapture);
                 string imageBlobUrl = "";
 

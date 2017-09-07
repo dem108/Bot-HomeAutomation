@@ -17,7 +17,7 @@ namespace Bot_HomeAutomation.Helpers
         [NonSerialized] private HttpClient httpclient;
         private string _iotPlatformApiBaseAddress = "http://homeautomationwebapi.azurewebsites.net/";
 
-        public async Task<string> PostDeviceElementSwitchAsync(string requestUri, DeviceElementSwitchModel control)
+        public async Task<string> PostDeviceElementSwitchAsync(IDialogContext context, string requestUri, DeviceElementSwitchModel control)
         {
             var content = JsonConvert.SerializeObject(control);
             var response = await httpclient.PostAsync(requestUri, new StringContent(content, Encoding.UTF8, "application/json"));
@@ -34,7 +34,7 @@ namespace Bot_HomeAutomation.Helpers
             return result;
         }
 
-        public async Task<string> ControlDeviceSwitchAsync(string deviceID, ElementType elementType, SwitchStatus switchStatus)
+        public async Task<string> ControlDeviceSwitchAsync(IDialogContext context, string deviceID, ElementType elementType, SwitchStatus switchStatus)
         {
 
             httpclient = new HttpClient
@@ -48,11 +48,11 @@ namespace Bot_HomeAutomation.Helpers
                 ElementType = elementType,
                 SwitchStatus = switchStatus
             };
-            string result = await PostDeviceElementSwitchAsync("api/deviceElement/setdeviceelementswitch", deviceElementSwitch);
+            string result = await PostDeviceElementSwitchAsync(context, "api/deviceElement/setdeviceelementswitch", deviceElementSwitch);
             return result;
         }
 
-        public async Task<double> GetTemperatureAsync(string deviceId, IDialogContext context)
+        public async Task<double> GetTemperatureAsync(IDialogContext context, string deviceId)
         {
             /*
             httpclient = new HttpClient
@@ -64,14 +64,14 @@ namespace Bot_HomeAutomation.Helpers
             return temperature;
             */
 
-            DeviceModel deviceModel = await ReadDeviceStatusAsync(deviceId, context);
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(context, deviceId);
 
             return deviceModel.Temperature;
 
 
 
         }
-        public async Task<double> GetHumidityAsync(string deviceId, IDialogContext context)
+        public async Task<double> GetHumidityAsync(IDialogContext context, string deviceId)
         {
             /*
             httpclient = new HttpClient
@@ -83,16 +83,16 @@ namespace Bot_HomeAutomation.Helpers
             return temperature;
             */
 
-            DeviceModel deviceModel = await ReadDeviceStatusAsync(deviceId, context);
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(context, deviceId);
 
             return deviceModel.Temperature;
 
 
         }
 
-        public async Task<double> GetRainForecastAsync(string deviceId, IDialogContext context)
+        public async Task<double> GetRainForecastAsync(IDialogContext context, string deviceId)
         { 
-            DeviceModel deviceModel = await ReadDeviceStatusAsync(deviceId, context);
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(context, deviceId);
 
             return deviceModel.Forecast;
             
@@ -115,7 +115,7 @@ namespace Bot_HomeAutomation.Helpers
             //return rainForecast;
         }
 
-        public async Task<DeviceModel> ReadDeviceStatusAsync(string deviceId, IDialogContext context)
+        public async Task<DeviceModel> ReadDeviceStatusAsync(IDialogContext context, string deviceId)
         {
             httpclient = new HttpClient
             {
@@ -162,7 +162,7 @@ namespace Bot_HomeAutomation.Helpers
 
 
 
-        public async Task<string> CaptureImageAsync(string deviceID)
+        public async Task<string> CaptureImageAsync(IDialogContext context, string deviceID)
         {
 
             httpclient = new HttpClient
@@ -180,7 +180,7 @@ namespace Bot_HomeAutomation.Helpers
 
             if (_DEBUG) Console.WriteLine($"DeviceControlHelper: CaptureImageAsync: {deviceElementSwitch.ToJsonString(formatting: Formatting.None)}");
 
-            string result = await PostDeviceElementSwitchAsync("api/deviceElement/CaptureImage", deviceElementSwitch);
+            string result = await PostDeviceElementSwitchAsync(context, "api/deviceElement/CaptureImage", deviceElementSwitch);
             return result;
         }
 
