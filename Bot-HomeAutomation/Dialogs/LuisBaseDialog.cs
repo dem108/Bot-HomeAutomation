@@ -159,13 +159,7 @@ namespace Bot_HomeAutomation.Dialogs
             {
                 await context.PostAsync(String.Format("Temperature is {0:0.00} degrees Centigrade.", temperature));
             }
-
-
-
-
-
-
-
+            
             context.Wait(this.MessageReceived);
         }
 
@@ -259,18 +253,111 @@ namespace Bot_HomeAutomation.Dialogs
                     await context.PostAsync($"elementType={element.ElementType}");
                     await context.PostAsync($"SwitchStatus={element.SwitchStatus}");
                     await context.PostAsync($"SetValue={element.SetValue}");
-                    await context.PostAsync($"PowerConsumptionValue={element.PowerConsumptionValue}");
-                    
+                    await context.PostAsync($"PowerConsumptionValue={element.PowerConsumptionValue}");   
                 }
-
-
-                
             }
             catch (Exception e)
             {
                 await context.PostAsync($"Bot needs some care: {e.ToString()}");
             }
- 
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("Capture.Image")]
+        public async Task LuisCaptureImage(IDialogContext context, LuisResult result)
+        {
+            if (_DEBUG) await context.PostAsync($"CaptureImage.");
+            await context.PostAsync($"Let me see what's happening in the room...");
+
+            try
+            {
+                string resultCapture = await _deviceControlHelper.CaptureImageAsync(_iotDeviceId);
+                if (_DEBUG) await context.PostAsync(resultCapture);
+                string imageBlobUrl = "";
+
+                var parsed = JObject.Parse(resultCapture);
+                foreach (var item in parsed)
+                {
+                    if (_DEBUG) await context.PostAsync($"key:{item.Key}, value:{item.Value}");
+                    if (item.Key == "result")
+                    {
+                        var parsedInternalJObject = JObject.Parse((string) item.Value);
+                        foreach (var itemInternal in parsedInternalJObject)
+                        {
+                            if (itemInternal.Key == "imageBlobUrl")
+                            {
+                                imageBlobUrl = (string)itemInternal.Value;
+                            }
+                        }
+                    }
+                }
+
+                if (imageBlobUrl != "")
+                {
+                    await DescribeImage(context, imageBlobUrl);
+                }
+                else
+                {
+                    await context.PostAsync("No image found. Check device functionality");
+                }
+            }
+            catch (NullReferenceException e)
+            {
+                await context.PostAsync($"Check if the device that bot is trying to talk with is operational (Is the bot talking to right device?): {e.ToString()}");
+            }
+            catch (Exception e)
+            {
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+            }
+            
+            context.Wait(this.MessageReceived);
+        }
+
+        private async Task DescribeImage(IDialogContext context, string imageBlobUrl)
+        {
+            var message = context.MakeMessage();
+            message.Attachments = new List<Attachment>();
+
+            var card = new HeroCard()
+            {
+                Title = "Room Now",
+                Subtitle = "(add description).",
+                Images = new List<CardImage>()
+                {
+                    new CardImage()
+                    {
+                        Url = imageBlobUrl
+                    }
+                }
+            };
+
+            message.Attachments.Add(card.ToAttachment());
+
+            await context.PostAsync(message);
+
+        }
+
+        [LuisIntent("Find.Person")]
+        public async Task LuisFindPerson(IDialogContext context, LuisResult result)
+        {
+            if (_DEBUG) await context.PostAsync($"FindPerson.");
+
+            await context.PostAsync("I'm not tracking wearables etc today. Let's see what I can find from the room camera.");
+
+            await LuisCaptureImage(context, result);
+            //TODO: check how it handles result
+
+            try
+            {
+                throw new NotImplementedException();
+
+
+            }
+            catch (Exception e)
+            {
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+            }
+
 
             context.Wait(this.MessageReceived);
         }

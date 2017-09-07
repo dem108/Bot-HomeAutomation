@@ -14,18 +14,8 @@ namespace Bot_HomeAutomation.Helpers
     {
         [NonSerialized] private HttpClient httpclient;
         private string _iotPlatformApiBaseAddress = "http://homeautomationwebapi.azurewebsites.net/";
-        //static public string _iotPlatformApiBaseAddress = "http://localhost:58675/";
 
-        /*
-        public DeviceControlHelper()
-        { 
-            _iotPlatformApiBaseAddress = "http://homeautomationwebapi.azurewebsites.net/";
-            //_iotPlatformApiBaseAddress = "http://localhost:58675/";
-
-        }
-        */
-
-        private static readonly bool _DEBUG = false;
+        private static readonly bool _DEBUG = true;
 
 
 
@@ -173,6 +163,30 @@ namespace Bot_HomeAutomation.Helpers
         }
 
 
-        
+
+        public async Task<string> CaptureImageAsync(string deviceID)
+        {
+
+            httpclient = new HttpClient
+            {
+                BaseAddress = new Uri(_iotPlatformApiBaseAddress)
+            };
+
+            var deviceElementSwitch = new DeviceElementSwitchModel
+            {
+                DeviceId = deviceID,
+                ElementType = ElementType.Camera,
+                SwitchStatus = SwitchStatus.On
+
+            };
+
+            if (_DEBUG) Console.WriteLine($"DeviceControlHelper: CaptureImageAsync: {deviceElementSwitch.ToJsonString(formatting: Formatting.None)}");
+
+            string result = await PostDeviceElementSwitchAsync("api/deviceElement/CaptureImage", deviceElementSwitch);
+            return result;
+        }
+
+
+
     }
 }
