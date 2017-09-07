@@ -12,12 +12,10 @@ namespace Bot_HomeAutomation.Helpers
     [Serializable]
     public class DeviceControlHelper
     {
-        [NonSerialized] private HttpClient httpclient;
-        private string _iotPlatformApiBaseAddress = "http://homeautomationwebapi.azurewebsites.net/";
-
         private static readonly bool _DEBUG = true;
 
-
+        [NonSerialized] private HttpClient httpclient;
+        private string _iotPlatformApiBaseAddress = "http://homeautomationwebapi.azurewebsites.net/";
 
         public async Task<string> PostDeviceElementSwitchAsync(string requestUri, DeviceElementSwitchModel control)
         {

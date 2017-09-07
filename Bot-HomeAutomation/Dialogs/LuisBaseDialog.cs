@@ -21,6 +21,7 @@ namespace Bot_HomeAutomation.Dialogs
     public class LuisBaseDialog : LuisDialog<object>
     {
         private DeviceControlHelper _deviceControlHelper;
+        private CognitiveServicesHelper _cognitiveServicesHelper;
         private string _iotDeviceId;
         private static readonly bool _DEBUG = true;
 
@@ -28,6 +29,7 @@ namespace Bot_HomeAutomation.Dialogs
         public LuisBaseDialog()
         {
             _deviceControlHelper = new DeviceControlHelper();
+            _cognitiveServicesHelper = new CognitiveServicesHelper();
             _iotDeviceId = "homehub-01";
         }
 
@@ -191,10 +193,7 @@ namespace Bot_HomeAutomation.Dialogs
             {
                 await context.PostAsync(String.Format("Humidity is {0:0.00} % r H.", humidity));
             }
-
-
-
-
+            
             context.Wait(this.MessageReceived);
         }
 
@@ -315,13 +314,27 @@ namespace Bot_HomeAutomation.Dialogs
 
         private async Task DescribeImage(IDialogContext context, string imageBlobUrl)
         {
+            string description = "default desciption";
+            try
+            {
+                description = await _cognitiveServicesHelper.PostComputerVisionAnalyzeAsync(imageBlobUrl);
+            }
+            catch (NullReferenceException e)
+            {
+                await context.PostAsync($"Check if the bot has access to Cognitive Services: {e.ToString()}");
+            }
+            catch (Exception e)
+            {
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+            }
+
             var message = context.MakeMessage();
             message.Attachments = new List<Attachment>();
 
             var card = new HeroCard()
             {
                 Title = "Room Now",
-                Subtitle = "(add description).",
+                Subtitle = description,
                 Images = new List<CardImage>()
                 {
                     new CardImage()
