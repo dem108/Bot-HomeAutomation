@@ -25,6 +25,9 @@ namespace Bot_HomeAutomation.Helpers
         }
         */
 
+        private static readonly bool _DEBUG = false;
+
+
 
         public async Task<string> PostDeviceElementSwitchAsync(string requestUri, DeviceElementSwitchModel control)
         {
@@ -43,7 +46,7 @@ namespace Bot_HomeAutomation.Helpers
             return result;
         }
 
-        public async void ControlDeviceSwitchAsync(string deviceID, ElementType elementType, SwitchStatus switchStatus)
+        public async Task<string> ControlDeviceSwitchAsync(string deviceID, ElementType elementType, SwitchStatus switchStatus)
         {
 
             httpclient = new HttpClient
@@ -58,10 +61,12 @@ namespace Bot_HomeAutomation.Helpers
                 SwitchStatus = switchStatus
             };
             string result = await PostDeviceElementSwitchAsync("api/deviceElement/setdeviceelementswitch", deviceElementSwitch);
+            return result;
         }
 
-        public async Task<string> GetTemperatureAsync(string deviceId)
+        public async Task<double> GetTemperatureAsync(string deviceId, IDialogContext context)
         {
+            /*
             httpclient = new HttpClient
             {
                 BaseAddress = new Uri(_iotPlatformApiBaseAddress)
@@ -69,9 +74,18 @@ namespace Bot_HomeAutomation.Helpers
 
             string temperature = await GetAsync($"api/deviceElement/Temperature?deviceId={deviceId}");
             return temperature;
+            */
+
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(deviceId, context);
+
+            return deviceModel.Temperature;
+
+
+
         }
-        public async Task<string> GetHumidityAsync(string deviceId)
+        public async Task<double> GetHumidityAsync(string deviceId, IDialogContext context)
         {
+            /*
             httpclient = new HttpClient
             {
                 BaseAddress = new Uri(_iotPlatformApiBaseAddress)
@@ -79,15 +93,17 @@ namespace Bot_HomeAutomation.Helpers
 
             string temperature = await GetAsync($"api/deviceElement/Humidity?deviceId={deviceId}");
             return temperature;
+            */
+
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(deviceId, context);
+
+            return deviceModel.Temperature;
+
+
         }
 
         public async Task<double> GetRainForecastAsync(string deviceId, IDialogContext context)
-        {
-            httpclient = new HttpClient
-            {
-                BaseAddress = new Uri(_iotPlatformApiBaseAddress)
-            };
-
+        { 
             DeviceModel deviceModel = await ReadDeviceStatusAsync(deviceId, context);
 
             return deviceModel.Forecast;
@@ -132,7 +148,7 @@ namespace Bot_HomeAutomation.Helpers
                     var value = item.Value;
 
                     //
-                    await context.PostAsync($"key={key}, value={value}");
+                    if (_DEBUG) await context.PostAsync($"key={key}, value={value}");
 
 
                     if (item.Key == "result")

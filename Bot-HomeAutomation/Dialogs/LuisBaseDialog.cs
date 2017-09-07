@@ -22,6 +22,7 @@ namespace Bot_HomeAutomation.Dialogs
     {
         private DeviceControlHelper _deviceControlHelper;
         private string _iotDeviceId;
+        private static readonly bool _DEBUG = true;
 
 
         public LuisBaseDialog()
@@ -52,10 +53,12 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Switch.Cooler.Off")]
         public async Task LuisSwitchCoolerOff(IDialogContext context, LuisResult result)
         {
-            string message = $"SwitchCoolerOff: Turning off the Cooler...";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"SwitchCoolerOff: Turning off the Cooler...");
 
-            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
+            string callResult = "";
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.Off);
+
+            if (_DEBUG) await context.PostAsync(callResult);
 
             context.Wait(this.MessageReceived);
         }
@@ -63,10 +66,12 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Switch.Cooler.On")]
         public async Task LuisSwitchCoolerOn(IDialogContext context, LuisResult result)
         {
-            string message = $"SwitchCoolerOn: Turning on the Cooler...";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"SwitchCoolerOn: Turning on the Cooler...");
 
-            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.On);
+            string callResult = "";
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Cooler, SwitchStatus.On);
+
+            if (_DEBUG) await context.PostAsync(callResult);
 
             context.Wait(this.MessageReceived);
         }
@@ -75,10 +80,12 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Switch.Heater.Off")]
         public async Task LuisSwitchHeaterOff(IDialogContext context, LuisResult result)
         {
-            string message = $"SwitchHeaterOff: Turning off the Heater...";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"SwitchHeaterOff: Turning off the Heater...");
 
-            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.Off);
+            string callResult = "";
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.Off);
+
+            if (_DEBUG) await context.PostAsync(callResult);
 
             context.Wait(this.MessageReceived);
         }
@@ -86,10 +93,12 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Switch.Heater.On")]
         public async Task LuisSwitchHeaterOn(IDialogContext context, LuisResult result)
         {
-            string message = $"SwitchHeaterOn: Turning on the Heater...";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"SwitchHeaterOn: Turning on the Heater...");
 
-            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.On);
+            string callResult = "";
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Heater, SwitchStatus.On);
+
+            if (_DEBUG) await context.PostAsync(callResult);
 
             context.Wait(this.MessageReceived);
         }
@@ -99,10 +108,12 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Switch.Light.Off")]
         public async Task LuisSwitchLightOff(IDialogContext context, LuisResult result)
         {
-            string message = $"SwitchLightOff: Turning off the Light...";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"SwitchLightOff: Turning off the Light...");
 
-            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.Off);
+            string callResult = "";
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.Off);
+
+            if (_DEBUG) await context.PostAsync(callResult);
 
             context.Wait(this.MessageReceived);
         }
@@ -110,10 +121,12 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Switch.Light.On")]
         public async Task LuisSwitchLightOn(IDialogContext context, LuisResult result)
         {
-            string message = $"SwitchLightOn: Turning on the Light...";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"SwitchLightOn: Turning on the Light...");
 
-            _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.On);
+            string callResult = "";
+            callResult = await _deviceControlHelper.ControlDeviceSwitchAsync(_iotDeviceId, ElementType.Light, SwitchStatus.On);
+
+            if (_DEBUG) await context.PostAsync(callResult);
 
             context.Wait(this.MessageReceived);
         }
@@ -121,10 +134,37 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Get.Temperature")]
         public async Task LuisGetTemperature(IDialogContext context, LuisResult result)
         {
-            string message = $"GetTemperature.";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"GetTemperature.");
 
-            await context.PostAsync(await _deviceControlHelper.GetTemperatureAsync(_iotDeviceId));
+            double temperature = 0;
+
+            try
+            {
+                temperature = await _deviceControlHelper.GetTemperatureAsync(_iotDeviceId, context);
+            }
+            catch (NullReferenceException e)
+            {
+                await context.PostAsync($"Check if the device that bot is trying to talk with is operational (Is the bot talking to right device?): {e.ToString()}");
+            }
+            catch (Exception e)
+            {
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+            }
+
+            if (temperature == 0)
+            {
+                await context.PostAsync("Temperature is not measured yet. Check device connectivity.");
+            }
+            else
+            {
+                await context.PostAsync(String.Format("Temperature is {0:0.00} degrees Centigrade.", temperature));
+            }
+
+
+
+
+
+
 
             context.Wait(this.MessageReceived);
         }
@@ -132,10 +172,34 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Get.Humidity")]
         public async Task LuisGetHumidity(IDialogContext context, LuisResult result)
         {
-            string message = $"GetHumidity.";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"GetHumidity.");
 
-            await context.PostAsync(await _deviceControlHelper.GetHumidityAsync(_iotDeviceId));
+            double humidity = 0;
+            
+            try
+            {
+                humidity = await _deviceControlHelper.GetHumidityAsync(_iotDeviceId, context);
+            }
+            catch (NullReferenceException e)
+            {
+                await context.PostAsync($"Check if the device that bot is trying to talk with is operational (Is the bot talking to right device?): {e.ToString()}");
+            }
+            catch (Exception e)
+            {
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+            }
+
+            if (humidity == 0)
+            {
+                await context.PostAsync("Humidity is not measured yet. Check device connectivity.");
+            }
+            else
+            {
+                await context.PostAsync(String.Format("Humidity is {0:0.00} % r H.", humidity));
+            }
+
+
+
 
             context.Wait(this.MessageReceived);
         }
@@ -143,8 +207,7 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Forecast.Rain")]
         public async Task LuisRainForecast(IDialogContext context, LuisResult result)
         {
-            string message = $"RainForecast.";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"RainForecast.");
 
             double probabilityRain = 0;
 
@@ -176,8 +239,7 @@ namespace Bot_HomeAutomation.Dialogs
         [LuisIntent("Get.DeviceStatus")]
         public async Task LuisGetDeviceStatus(IDialogContext context, LuisResult result)
         {
-            string message = $"GetDeviceStatus.";
-            await context.PostAsync(message);
+            if (_DEBUG) await context.PostAsync($"GetDeviceStatus.");
 
             //DeviceModel deviceStatus = 
             //await 

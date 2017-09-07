@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace Bot_HomeAutomation.Dialogs
 {
+
     [Serializable]
     public class RootDialog : IDialog<object>
     {
@@ -77,7 +78,7 @@ namespace Bot_HomeAutomation.Dialogs
                 {
                     Title = "Cooler On",
                     Type = "imBack",
-                    Value = "Turn on the coolor"
+                    Value = "Turn on the cooler"
                 },
                 new CardAction()
                 {
@@ -89,7 +90,7 @@ namespace Bot_HomeAutomation.Dialogs
                 {
                     Title = "Get Humidity",
                     Type = "imBack",
-                    Value = "How is the humididy?"
+                    Value = "How is the humidity?"
                 },
                 new CardAction()
                 {
