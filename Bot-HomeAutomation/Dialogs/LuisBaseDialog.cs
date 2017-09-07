@@ -317,7 +317,7 @@ namespace Bot_HomeAutomation.Dialogs
             string description = "default desciption";
             try
             {
-                description = await _cognitiveServicesHelper.PostComputerVisionAnalyzeAsync(imageBlobUrl);
+                description = await _cognitiveServicesHelper.PostComputerVisionDescribeAsync(context, imageBlobUrl);
             }
             catch (NullReferenceException e)
             {
