@@ -140,6 +140,38 @@ namespace Bot_HomeAutomation.Dialogs
             context.Wait(this.MessageReceived);
         }
 
+        [LuisIntent("Forecast.Rain")]
+        public async Task LuisRainForecast(IDialogContext context, LuisResult result)
+        {
+            string message = $"RainForecast.";
+            await context.PostAsync(message);
+
+            double probabilityRain = 0;
+
+            try
+            {
+                probabilityRain = await _deviceControlHelper.GetRainForecastAsync(_iotDeviceId, context);
+            }
+            catch (NullReferenceException e)
+            {
+                await context.PostAsync($"Check if the device that bot is trying to talk with is operational (Is the bot talking to right device?): {e.ToString()}");
+            }
+            catch (Exception e)
+            {
+                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+            }
+
+            if (probabilityRain == 0)
+            {
+                await context.PostAsync("Probability of rain is not predicted yet. Check device connectivity.");
+            }
+            else
+            {
+                await context.PostAsync(String.Format("Probability of rain is {0:0.00} %.", probabilityRain * 100));
+            }
+
+            context.Wait(this.MessageReceived);
+        }
 
         [LuisIntent("Get.DeviceStatus")]
         public async Task LuisGetDeviceStatus(IDialogContext context, LuisResult result)
@@ -169,7 +201,7 @@ namespace Bot_HomeAutomation.Dialogs
                     
                 }
 
-                //Power Consumption is always 0???
+
                 
             }
             catch (Exception e)

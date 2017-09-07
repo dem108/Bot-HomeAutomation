@@ -81,6 +81,35 @@ namespace Bot_HomeAutomation.Helpers
             return temperature;
         }
 
+        public async Task<double> GetRainForecastAsync(string deviceId, IDialogContext context)
+        {
+            httpclient = new HttpClient
+            {
+                BaseAddress = new Uri(_iotPlatformApiBaseAddress)
+            };
+
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(deviceId, context);
+
+            return deviceModel.Forecast;
+            
+            //TODO: Wrong API URI
+            /* TODO: 
+             * - Capture Image
+             * - Cognitive Services
+             * - Value model
+             * - Skype deployment issue
+             * - Check Power Consumption value: it is always 0???
+             * - Format message results (rich cards)
+             * 
+             * 
+             * 
+             * LUIS training:
+             * where is grandpa
+             * who is in the room
+             */
+
+            //return rainForecast;
+        }
 
         public async Task<DeviceModel> ReadDeviceStatusAsync(string deviceId, IDialogContext context)
         {
@@ -116,7 +145,7 @@ namespace Bot_HomeAutomation.Helpers
             }
             catch (NullReferenceException e)
             {
-                await context.PostAsync($"Check if the bot is trying to talk with operational device: {e.ToString()}");
+                await context.PostAsync($"Check if the device that bot is trying to talk with is operational (Is the bot talking to right device?): {e.ToString()}");
 
             }
             catch (Exception e)
