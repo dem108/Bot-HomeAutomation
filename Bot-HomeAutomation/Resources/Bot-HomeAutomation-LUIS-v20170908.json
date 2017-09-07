@@ -1,0 +1,676 @@
+{
+  "luis_schema_version": "2.1.0",
+  "versionId": "0.2",
+  "name": "Bot-HomeAutomation-LUISv2",
+  "desc": "",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "Capture.Image"
+    },
+    {
+      "name": "Find.Person"
+    },
+    {
+      "name": "Forecast.Rain"
+    },
+    {
+      "name": "Get.DeviceStatus"
+    },
+    {
+      "name": "Get.Humidity"
+    },
+    {
+      "name": "Get.Temperature"
+    },
+    {
+      "name": "Hello"
+    },
+    {
+      "name": "Help"
+    },
+    {
+      "name": "Make.It.Cooler"
+    },
+    {
+      "name": "Make.It.Warmer"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "Set.Light.Brighter"
+    },
+    {
+      "name": "Set.Light.Darker"
+    },
+    {
+      "name": "Switch.Cooler.Off"
+    },
+    {
+      "name": "Switch.Cooler.On"
+    },
+    {
+      "name": "Switch.Heater.Off"
+    },
+    {
+      "name": "Switch.Heater.On"
+    },
+    {
+      "name": "Switch.Light.Off"
+    },
+    {
+      "name": "Switch.Light.On"
+    }
+  ],
+  "entities": [
+    {
+      "name": "Person"
+    }
+  ],
+  "composites": [],
+  "closedLists": [],
+  "bing_entities": [
+    "encyclopedia",
+    "number",
+    "percentage",
+    "temperature"
+  ],
+  "actions": [],
+  "model_features": [],
+  "regex_features": [],
+  "utterances": [
+    {
+      "text": "hello",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "turn on the light",
+      "intent": "Switch.Light.On",
+      "entities": []
+    },
+    {
+      "text": "turn off the light",
+      "intent": "Switch.Light.Off",
+      "entities": []
+    },
+    {
+      "text": "take a picture",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "take a photo",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "turn off the lights",
+      "intent": "Switch.Light.Off",
+      "entities": []
+    },
+    {
+      "text": "turn the light on",
+      "intent": "Switch.Light.On",
+      "entities": []
+    },
+    {
+      "text": "hi",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "light off",
+      "intent": "Switch.Light.Off",
+      "entities": []
+    },
+    {
+      "text": "make it warmer",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "make it cooler",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "what can i do",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "help",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "good morning",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "good afternoon",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "turn the light off",
+      "intent": "Switch.Light.Off",
+      "entities": []
+    },
+    {
+      "text": "turn on the heater",
+      "intent": "Switch.Heater.On",
+      "entities": []
+    },
+    {
+      "text": "good evening",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "hey",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "light on",
+      "intent": "Switch.Light.On",
+      "entities": []
+    },
+    {
+      "text": "make the room darker",
+      "intent": "Set.Light.Darker",
+      "entities": []
+    },
+    {
+      "text": "make the room brighter",
+      "intent": "Set.Light.Brighter",
+      "entities": []
+    },
+    {
+      "text": "help me",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "is it cold?",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "where is my dog",
+      "intent": "Find.Person",
+      "entities": []
+    },
+    {
+      "text": "what can i do?",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "what can you do?",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "greetings",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "is it going to rain?",
+      "intent": "Forecast.Rain",
+      "entities": []
+    },
+    {
+      "text": "turn off the music",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "make it dark",
+      "intent": "Switch.Light.Off",
+      "entities": []
+    },
+    {
+      "text": "what can you do",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "get temperature",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "how cold is it?",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "it's too cold",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "status",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "humidity",
+      "intent": "Get.Humidity",
+      "entities": []
+    },
+    {
+      "text": "it's too hot",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "will it rain",
+      "intent": "Forecast.Rain",
+      "entities": []
+    },
+    {
+      "text": "temp",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "temperature",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "get status",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "status report",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "it's too dark",
+      "intent": "Set.Light.Brighter",
+      "entities": []
+    },
+    {
+      "text": "dim the light",
+      "intent": "Set.Light.Darker",
+      "entities": []
+    },
+    {
+      "text": "lower the temperature",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "is it humid",
+      "intent": "Get.Humidity",
+      "entities": []
+    },
+    {
+      "text": "show me the room",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "make it bright",
+      "intent": "Switch.Light.On",
+      "entities": []
+    },
+    {
+      "text": "make it darker",
+      "intent": "Set.Light.Darker",
+      "entities": []
+    },
+    {
+      "text": "what is the temperature now?",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "nice to talk to you",
+      "intent": "Hello",
+      "entities": []
+    },
+    {
+      "text": "what's in the room",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "should i bring umbrella",
+      "intent": "Forecast.Rain",
+      "entities": []
+    },
+    {
+      "text": "brighter",
+      "intent": "Set.Light.Brighter",
+      "entities": []
+    },
+    {
+      "text": "it's cold",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "dimmer",
+      "intent": "Set.Light.Darker",
+      "entities": []
+    },
+    {
+      "text": "heater on",
+      "intent": "Switch.Heater.On",
+      "entities": []
+    },
+    {
+      "text": "heater off",
+      "intent": "Switch.Heater.Off",
+      "entities": []
+    },
+    {
+      "text": "temperatur",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "turn the heater on",
+      "intent": "Switch.Heater.On",
+      "entities": []
+    },
+    {
+      "text": "turn the heater off",
+      "intent": "Switch.Heater.Off",
+      "entities": []
+    },
+    {
+      "text": "get stat",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "show humidity",
+      "intent": "Get.Humidity",
+      "entities": []
+    },
+    {
+      "text": "snap play my music",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "make edge ' s start page homepage",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "turn on the internet in my bedroom please",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "lower your volume",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "decrease temperature for me please",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "please add music",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "give me more light",
+      "intent": "Set.Light.Brighter",
+      "entities": []
+    },
+    {
+      "text": "too cold",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "snap game dvr .",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "please unsnap ustream",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "how is the device doing?",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "is it warm at home?",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "how cold is it in the room?",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "turn the cooler off",
+      "intent": "Switch.Cooler.Off",
+      "entities": []
+    },
+    {
+      "text": "kill the cooler",
+      "intent": "Switch.Cooler.Off",
+      "entities": []
+    },
+    {
+      "text": "turn off the cooler",
+      "intent": "Switch.Cooler.Off",
+      "entities": []
+    },
+    {
+      "text": "can you make it darker",
+      "intent": "Set.Light.Darker",
+      "entities": []
+    },
+    {
+      "text": "more darkness",
+      "intent": "Set.Light.Darker",
+      "entities": []
+    },
+    {
+      "text": "switch cooler on",
+      "intent": "Switch.Cooler.On",
+      "entities": []
+    },
+    {
+      "text": "turn the cooler on",
+      "intent": "Switch.Cooler.On",
+      "entities": []
+    },
+    {
+      "text": "set the cooler lower",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "that's too cool",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "very hot",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "heat it on",
+      "intent": "Switch.Heater.On",
+      "entities": []
+    },
+    {
+      "text": "switch heater on",
+      "intent": "Switch.Heater.On",
+      "entities": []
+    },
+    {
+      "text": "switch heater off",
+      "intent": "Switch.Heater.Off",
+      "entities": []
+    },
+    {
+      "text": "cooler off",
+      "intent": "Switch.Cooler.Off",
+      "entities": []
+    },
+    {
+      "text": "can you warm it",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "cooler on",
+      "intent": "Switch.Cooler.On",
+      "entities": []
+    },
+    {
+      "text": "too cool",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "turn on the cooler",
+      "intent": "Switch.Cooler.On",
+      "entities": []
+    },
+    {
+      "text": "get temp",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "show me the device status",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "report devices status",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "how humid is it?",
+      "intent": "Get.Humidity",
+      "entities": []
+    },
+    {
+      "text": "i want higher temperature",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "i want low temperature",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "i want the room to be cool",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "can you make it warmer",
+      "intent": "Make.It.Warmer",
+      "entities": []
+    },
+    {
+      "text": "can you make the room a little bit cooler",
+      "intent": "Make.It.Cooler",
+      "entities": []
+    },
+    {
+      "text": "report device status",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "how is the humididy?",
+      "intent": "Get.Humidity",
+      "entities": []
+    },
+    {
+      "text": "report status",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "readdevicestatus",
+      "intent": "Get.DeviceStatus",
+      "entities": []
+    },
+    {
+      "text": "how is the temperature?",
+      "intent": "Get.Temperature",
+      "entities": []
+    },
+    {
+      "text": "who is in the room",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "camera shot",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "room camera",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "capture an image",
+      "intent": "Capture.Image",
+      "entities": []
+    },
+    {
+      "text": "how is my dog",
+      "intent": "Find.Person",
+      "entities": []
+    },
+    {
+      "text": "how is my grandpa doing",
+      "intent": "Find.Person",
+      "entities": [
+        {
+          "entity": "Person",
+          "startPos": 10,
+          "endPos": 16
+        }
+      ]
+    },
+    {
+      "text": "where is my grandpa",
+      "intent": "Find.Person",
+      "entities": [
+        {
+          "entity": "Person",
+          "startPos": 12,
+          "endPos": 18
+        }
+      ]
+    }
+  ]
+}

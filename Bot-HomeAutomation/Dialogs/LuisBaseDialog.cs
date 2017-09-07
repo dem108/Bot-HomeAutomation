@@ -12,6 +12,14 @@ using System.Net.Http;
 using System.Text;
 using HomeAutomationWebAPI.Models;
 using Bot_HomeAutomation.Helpers;
+using Microsoft.ProjectOxford.Face.Contract;
+using Microsoft.ProjectOxford.Vision.Contract;
+using Microsoft.ProjectOxford.Vision;
+using Microsoft.ProjectOxford.Common;
+using Microsoft.ProjectOxford.Face;
+using Microsoft.ProjectOxford.Emotion;
+using Microsoft.ProjectOxford.Common.Contract;
+using AdaptiveCards;
 
 namespace Bot_HomeAutomation.Dialogs
 {
@@ -312,23 +320,132 @@ namespace Bot_HomeAutomation.Dialogs
             context.Wait(this.MessageReceived);
         }
 
+
+        static int iToPickOne = 0;
+
         private async Task DescribeImage(IDialogContext context, string imageBlobUrl)
         {
-            string description = "default desciption";
-            try
+            string description = await _cognitiveServicesHelper.GetDescriptionAsync(context, imageBlobUrl);
+            List<CardAction> cardButtons = new List<CardAction>();
+
+            Attachment attachement = new Attachment();
+            AdaptiveCard imageDescription = new AdaptiveCard();
+
+            Microsoft.ProjectOxford.Face.Contract.Face[] detecedFaces = await _cognitiveServicesHelper.GetFacesAsync(context, imageBlobUrl);
+            if (detecedFaces != null && detecedFaces.Length > 0)
             {
-                description = await _cognitiveServicesHelper.PostComputerVisionDescribeAsync(context, imageBlobUrl);
-            }
-            catch (NullReferenceException e)
-            {
-                await context.PostAsync($"Check if the bot has access to Cognitive Services: {e.ToString()}");
-            }
-            catch (Exception e)
-            {
-                await context.PostAsync($"Bot needs some care: {e.ToString()}");
+                description += $"\nAlso I see {detecedFaces.Length} person(s).";
+
+                imageDescription.Title = "In Room Now";
+                imageDescription.Body.Add(new TextBlock()
+                {
+                    Text = "Who are there?",
+                    Weight = TextWeight.Bolder,
+                    IsSubtle = false
+                });
+                imageDescription.Body.Add(new ColumnSet()
+                {
+                    Columns = new List<Column>()
+                    {
+                        new Column()
+                        {
+                            Size = "2",
+                            Items = new List<CardElement>()
+                            {
+                                new AdaptiveCards.Image()
+                                {
+                                    Url = imageBlobUrl,
+                                    Size =  ImageSize.Stretch
+                                    
+                                }
+                            }
+                        },
+                        new Column()
+                        {
+                            Size = "1",
+                            Items = new List<CardElement>()
+                            {
+                                new AdaptiveCards.TextBlock()
+                                {
+                                    Text = description
+                                },
+                                new AdaptiveCards.TextBlock()
+                                {
+                                    Text = "The other tags I see...:"
+                                }
+                            }
+
+                        }
+                    }
+                });
+                imageDescription.Body.Add(new TextBlock()
+                {
+                    Text = "People identified in the room",
+                    Weight = TextWeight.Bolder,
+                    IsSubtle = false,
+                    Separation = SeparationStyle.Strong
+                });
+
+
+
+                foreach (Microsoft.ProjectOxford.Face.Contract.Face face in detecedFaces)
+                {
+                    string representativeEmotion = "";
+                    iToPickOne = 1;
+                    foreach (var item in face.FaceAttributes.Emotion.ToRankedList())
+                    {
+                        if (iToPickOne == 1)
+                            representativeEmotion = $"{item.Key} ({item.Value}), ";
+                        iToPickOne++;
+                    }
+
+
+
+
+                    imageDescription.Body.Add(new ColumnSet()
+                    {
+                        Columns = new List<Column>()
+                    {
+                        new Column()
+                        {
+                            Size = "1",
+                            Items = new List<CardElement>()
+                            {
+                                new AdaptiveCards.Image()
+                                {
+                                    Size = ImageSize.Small,
+                                    Url = imageBlobUrl
+                                }
+                            }
+                        },
+                        new Column()
+                        {
+                            Size = "5",
+                            Items = new List<CardElement>()
+                            {
+                                new TextBlock()
+                                {
+                                    Text = $"{face.FaceAttributes.Age} years old {face.FaceAttributes.Gender} - {representativeEmotion}"
+                                    //text += $"left:{face.FaceRectangle.Left}, width:{face.FaceRectangle.Width}";
+
+                                }
+                            }
+                        }
+                    }
+                    });
+                    
+                }
+                //for each person
+
             }
 
+
+            attachement.ContentType = AdaptiveCard.ContentType;
+            attachement.Content = imageDescription;
+
             var message = context.MakeMessage();
+            
+            /*
             message.Attachments = new List<Attachment>();
 
             var card = new HeroCard()
@@ -341,10 +458,15 @@ namespace Bot_HomeAutomation.Dialogs
                     {
                         Url = imageBlobUrl
                     }
-                }
+                },
+                Buttons = cardButtons
             };
 
             message.Attachments.Add(card.ToAttachment());
+            */
+
+            message.Attachments.Add(attachement);
+
 
             await context.PostAsync(message);
 
