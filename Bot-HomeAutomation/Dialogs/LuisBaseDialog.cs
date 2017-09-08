@@ -32,6 +32,7 @@ namespace Bot_HomeAutomation.Dialogs
         private CognitiveServicesHelper _cognitiveServicesHelper;
         private string _iotDeviceId;
         private static bool _DEBUG = false;
+        private static string _version = "20170908 2146";
 
 
         public LuisBaseDialog()
@@ -88,8 +89,16 @@ namespace Bot_HomeAutomation.Dialogs
             {
                 message = $"Did nothing.";
             }
-            
+
             await context.PostAsync(message);
+            context.Wait(this.MessageReceived);
+        }
+
+
+        [LuisIntent("Check.Version")]
+        public async Task LuisCheckVersion(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync($"version: {_version}");
             context.Wait(this.MessageReceived);
         }
 
@@ -367,7 +376,7 @@ namespace Bot_HomeAutomation.Dialogs
         static int iToPickOne = 0;
 
 
-        private async Task<Attachment> GetAttachmentDescribingImageWithAdaptiveCard(IDialogContext context, string imageBlobUrl, string description)
+        private async Task<List<Attachment>> GetAttachmentsDescribingImageWithAdaptiveCard(IDialogContext context, string imageBlobUrl, string description)
         {
             Attachment attachment = new Attachment();
             string descriptionAdded = description;
@@ -430,7 +439,7 @@ namespace Bot_HomeAutomation.Dialogs
                 {
                     tempMessage = "No people identified in the room";
                 }
-                else if (detecedFaces.Length == 0)
+                else if (detecedFaces.Length > 0)
                 {
                     tempMessage = "People identified in the room";
                 }
@@ -496,26 +505,27 @@ namespace Bot_HomeAutomation.Dialogs
             attachment.ContentType = AdaptiveCard.ContentType;
             attachment.Content = imageDescription;
 
-            return attachment;
+            List<Attachment> attachments = new List<Attachment>
+            {
+                attachment
+            };
+
+            return attachments;
         }
 
-
-
-        private async Task DescribeImage(IDialogContext context, string imageBlobUrl)
+        private async Task<List<Attachment>> GetAttachmentsDescribingImageWithHeroCard(IDialogContext context, string imageBlobUrl, string description)
         {
-            string description = await _cognitiveServicesHelper.GetDescriptionAsync(context, imageBlobUrl);
-            List<CardAction> cardButtons = new List<CardAction>();
-            
-            var message = context.MakeMessage();
-            message.Attachments.Add(await GetAttachmentDescribingImageWithAdaptiveCard(context, imageBlobUrl, description));
+            List<Attachment> attachments = new List<Attachment>();
 
-            /*
-            message.Attachments = new List<Attachment>();
+            string descriptionAdded = description;
 
-            var card = new HeroCard()
+            Microsoft.ProjectOxford.Face.Contract.Face[] detecedFaces = await _cognitiveServicesHelper.GetFacesAsync(context, imageBlobUrl);
+
+            //general description
+            attachments.Add(new HeroCard()
             {
-                Title = "Room Now",
-                Subtitle = description,
+                Title = "Who are there?",
+                Subtitle = $"{description}. I Also see {detecedFaces.Length} person(s). The other things I see is...(tags)",
                 Images = new List<CardImage>()
                 {
                     new CardImage()
@@ -523,11 +533,79 @@ namespace Bot_HomeAutomation.Dialogs
                         Url = imageBlobUrl
                     }
                 },
-                Buttons = cardButtons
-            };
+            }.ToAttachment());
 
-            message.Attachments.Add(card.ToAttachment());
-            */
+            //people summary
+            string tempMessage = "";
+            if (detecedFaces != null && detecedFaces.Length == 0)
+                tempMessage = "No people identified in the room";
+            else if (detecedFaces.Length > 0)
+                tempMessage = "People identified in the room";
+            attachments.Add(new ThumbnailCard() { Title = tempMessage }.ToAttachment());
+
+            //for each person identified:
+
+
+            
+            
+            //for each person identified:
+            foreach (Microsoft.ProjectOxford.Face.Contract.Face face in detecedFaces)
+            {
+                string representativeEmotion = "";
+                iToPickOne = 1;
+                foreach (var item in face.FaceAttributes.Emotion.ToRankedList())
+                {
+                    if (iToPickOne == 1)
+                        representativeEmotion = $"{item.Key} ({item.Value}), ";
+                    iToPickOne++;
+                }
+
+                //snapshot and description for each person
+                attachments.Add(new ThumbnailCard()
+                {
+                    Images = new List<CardImage>
+                {
+                    new CardImage
+                    {
+                        Url = imageBlobUrl
+                    }
+                },
+                    Title = "person1 (name if identified)",
+                    Subtitle = $"{face.FaceAttributes.Age} years old {face.FaceAttributes.Gender} - {representativeEmotion}",
+                }.ToAttachment());
+
+            }
+
+            return attachments;
+
+        }
+        
+        private async Task DescribeImage(IDialogContext context, string imageBlobUrl)
+        {
+            string description = await _cognitiveServicesHelper.GetDescriptionAsync(context, imageBlobUrl);
+            List<CardAction> cardButtons = new List<CardAction>();
+
+            //IChannelCapability a = context.Activity.ChannelData;
+
+            var message = context.MakeMessage();
+
+            //Skype does not support Adaptive Card today. REplace below condition with Channel Detector (Not implemented yet).
+            if (0 != 0)
+            {
+                foreach (Attachment attachment in await GetAttachmentsDescribingImageWithAdaptiveCard(context, imageBlobUrl, description))
+                {
+                    message.Attachments.Add(attachment);
+                }
+            }
+            else //use Skype-compatible attachments
+            {
+                foreach (Attachment attachment in await GetAttachmentsDescribingImageWithHeroCard(context, imageBlobUrl, description))
+                {
+                    message.Attachments.Add(attachment);
+                }
+
+            }
+
 
 
 
@@ -535,12 +613,13 @@ namespace Bot_HomeAutomation.Dialogs
 
         }
 
+
         [LuisIntent("Find.Person")]
         public async Task LuisFindPerson(IDialogContext context, LuisResult result)
         {
             if (_DEBUG) await context.PostAsync($"FindPerson.");
 
-            await context.PostAsync("I'm not tracking wearables etc today. Let's see what I can find from the room camera.");
+            await context.PostAsync("Although I'm not tracking wearables today, I might be able to find someone from the camera. Let me take a look.");
 
             await LuisCaptureImage(context, result);
             //TODO: check how it handles result
