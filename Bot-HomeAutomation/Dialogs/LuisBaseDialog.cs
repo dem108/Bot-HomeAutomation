@@ -32,7 +32,7 @@ namespace Bot_HomeAutomation.Dialogs
         private CognitiveServicesHelper _cognitiveServicesHelper;
         private string _iotDeviceId;
         private static bool _DEBUG = false;
-        private static string _version = "20170908 2146";
+        private static string _version = "20170909 0049 KST";
 
 
         public LuisBaseDialog()
@@ -65,6 +65,16 @@ namespace Bot_HomeAutomation.Dialogs
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);
         }
+
+
+
+        [LuisIntent("Start.Over")]
+        public async Task LuisStartOver(IDialogContext context, LuisResult result)
+        {
+            context.PostAsync("Starting over...");
+            context.Done(context.MakeMessage());
+        }
+
 
         [LuisIntent("SET.DEBUG")]
         public async Task LuisSetDebug(IDialogContext context, LuisResult result)

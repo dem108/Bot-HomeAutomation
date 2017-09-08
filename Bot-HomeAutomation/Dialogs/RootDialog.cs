@@ -20,12 +20,15 @@ namespace Bot_HomeAutomation.Dialogs
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<object> result)
         {
-            var activity = await result as Activity;
-            await this.SendWelcomeMessageAsync(context, activity);
-            
+            //var activity = await result as Activity;
+            //await this.SendWelcomeMessageAsync(context, activity);
+
+            //for now, not using result.
+            await this.SendWelcomeMessageAsync(context);
+
         }
 
-        private async Task SendWelcomeMessageAsync(IDialogContext context, Activity activity)
+        private async Task SendWelcomeMessageAsync(IDialogContext context)
 
         {
 
@@ -39,13 +42,13 @@ namespace Bot_HomeAutomation.Dialogs
             //but will need to get weather info from somewhere. 
 
 
-            await context.PostAsync(InitializeWelcomeMessageAsync(activity));
+            await context.PostAsync(InitializeWelcomeMessageAsync(context));
 
             context.Call(new LuisBaseDialog(), this.MessageReceivedAsync);
 
         }
 
-        static Activity InitializeWelcomeMessageAsync(Activity activity)
+        static Activity InitializeWelcomeMessageAsync(IDialogContext context)
         {
 
             List<CardAction> cardButtons = new List<CardAction>
@@ -123,7 +126,8 @@ namespace Bot_HomeAutomation.Dialogs
             };
 
 
-            Activity replyToConversation = activity.CreateReply("");
+            //Activity replyToConversation = activity.CreateReply("");
+            Activity replyToConversation = (Activity) context.MakeMessage();
             replyToConversation.Attachments = new List<Attachment>
             {
                 card.ToAttachment()
