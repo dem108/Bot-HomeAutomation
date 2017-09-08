@@ -164,6 +164,7 @@
     <Content Include="Resources\Han So Slow 01.png" />
     <Content Include="Resources\Han So Slow 02.png" />
     <Content Include="Resources\Han So Slow 03.png" />
+    <Content Include="Resources\TODO and Release History.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
