@@ -12,7 +12,7 @@ namespace Bot_HomeAutomation.Helpers
     [Serializable]
     public class DeviceControlHelper
     {
-        private static readonly bool _DEBUG = true;
+        private static readonly bool _DEBUG = false;
 
         [NonSerialized] private HttpClient httpclient;
         private string _iotPlatformApiBaseAddress = "http://homeautomationwebapi.azurewebsites.net/";

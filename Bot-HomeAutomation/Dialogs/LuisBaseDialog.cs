@@ -31,7 +31,7 @@ namespace Bot_HomeAutomation.Dialogs
         private DeviceControlHelper _deviceControlHelper;
         private CognitiveServicesHelper _cognitiveServicesHelper;
         private string _iotDeviceId;
-        private static readonly bool _DEBUG = true;
+        private static bool _DEBUG = false;
 
 
         public LuisBaseDialog()
@@ -40,6 +40,20 @@ namespace Bot_HomeAutomation.Dialogs
             _cognitiveServicesHelper = new CognitiveServicesHelper();
             _iotDeviceId = "homehub-01";
         }
+
+        public EntityRecommendation GetTopEntity(IList<EntityRecommendation> entities)
+        {
+            EntityRecommendation entity = null;
+            float tempScore = 0;
+            foreach(EntityRecommendation item in entities)
+            {
+                if (item.Score > tempScore) //not inclusive of '='
+                    entity = item;
+            }
+
+            return entity;
+        }
+
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -50,7 +64,36 @@ namespace Bot_HomeAutomation.Dialogs
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);
         }
-        
+
+        [LuisIntent("SET.DEBUG")]
+        public async Task LuisSetDebug(IDialogContext context, LuisResult result)
+        {
+            EntityRecommendation entity = GetTopEntity(result.Entities);
+
+            if (_DEBUG) context.PostAsync($"topEntity: {entity}");
+
+            string message;
+
+            if (entity != null && entity.Entity == "on")
+            {
+                _DEBUG = true;
+                message = $"_DEBUG set to true.";
+            }
+            else if (entity.Entity == "off")
+            {
+                _DEBUG = false;
+                message = $"_DEBUG set to false.";
+            }
+            else
+            {
+                message = $"Did nothing.";
+            }
+            
+            await context.PostAsync(message);
+            context.Wait(this.MessageReceived);
+        }
+
+
         [LuisIntent("Help")]
         public async Task LuisHelp(IDialogContext context, LuisResult result)
         {
@@ -323,17 +366,19 @@ namespace Bot_HomeAutomation.Dialogs
 
         static int iToPickOne = 0;
 
-        private async Task DescribeImage(IDialogContext context, string imageBlobUrl)
-        {
-            string description = await _cognitiveServicesHelper.GetDescriptionAsync(context, imageBlobUrl);
-            List<CardAction> cardButtons = new List<CardAction>();
 
-            Attachment attachement = new Attachment();
+        private async Task<Attachment> GetAttachmentDescribingImageWithAdaptiveCard(IDialogContext context, string imageBlobUrl, string description)
+        {
+            Attachment attachment = new Attachment();
+            string descriptionAdded = description;
+
             AdaptiveCard imageDescription = new AdaptiveCard();
 
             Microsoft.ProjectOxford.Face.Contract.Face[] detecedFaces = await _cognitiveServicesHelper.GetFacesAsync(context, imageBlobUrl);
-            if (detecedFaces != null && detecedFaces.Length > 0)
+
+            if (detecedFaces != null) // there could be 0 person in the image
             {
+                
                 description += $"\nAlso I see {detecedFaces.Length} person(s).";
 
                 imageDescription.Title = "In Room Now";
@@ -346,48 +391,59 @@ namespace Bot_HomeAutomation.Dialogs
                 imageDescription.Body.Add(new ColumnSet()
                 {
                     Columns = new List<Column>()
+                {
+                    new Column()
                     {
-                        new Column()
+                        Size = "2",
+                        Items = new List<CardElement>()
                         {
-                            Size = "2",
-                            Items = new List<CardElement>()
+                            new AdaptiveCards.Image()
                             {
-                                new AdaptiveCards.Image()
-                                {
-                                    Url = imageBlobUrl,
-                                    Size =  ImageSize.Stretch
-                                    
-                                }
-                            }
-                        },
-                        new Column()
-                        {
-                            Size = "1",
-                            Items = new List<CardElement>()
-                            {
-                                new AdaptiveCards.TextBlock()
-                                {
-                                    Text = description
-                                },
-                                new AdaptiveCards.TextBlock()
-                                {
-                                    Text = "The other tags I see...:"
-                                }
-                            }
+                                Url = imageBlobUrl,
+                                Size =  ImageSize.Stretch
 
+                            }
                         }
+                    },
+                    new Column()
+                    {
+                        Size = "1",
+                        Items = new List<CardElement>()
+                        {
+                            new AdaptiveCards.TextBlock()
+                            {
+                                Text = descriptionAdded
+                            },
+                            new AdaptiveCards.TextBlock()
+                            {
+                                Text = "The other things I see...(tags):"
+                            }
+                        }
+
                     }
+                }
                 });
+
+                //summary
+                string tempMessage = "";
+                if (detecedFaces != null && detecedFaces.Length == 0)
+                {
+                    tempMessage = "No people identified in the room";
+                }
+                else if (detecedFaces.Length == 0)
+                {
+                    tempMessage = "People identified in the room";
+                }
+
                 imageDescription.Body.Add(new TextBlock()
                 {
-                    Text = "People identified in the room",
+                    Text = tempMessage,
                     Weight = TextWeight.Bolder,
                     IsSubtle = false,
                     Separation = SeparationStyle.Strong
                 });
-
-
-
+                
+                //for each person identified:
                 foreach (Microsoft.ProjectOxford.Face.Contract.Face face in detecedFaces)
                 {
                     string representativeEmotion = "";
@@ -399,9 +455,7 @@ namespace Bot_HomeAutomation.Dialogs
                         iToPickOne++;
                     }
 
-
-
-
+                    //snapshot and description for each person
                     imageDescription.Body.Add(new ColumnSet()
                     {
                         Columns = new List<Column>()
@@ -433,18 +487,28 @@ namespace Bot_HomeAutomation.Dialogs
                         }
                     }
                     });
-                    
+
                 }
                 //for each person
-
+            
             }
 
+            attachment.ContentType = AdaptiveCard.ContentType;
+            attachment.Content = imageDescription;
 
-            attachement.ContentType = AdaptiveCard.ContentType;
-            attachement.Content = imageDescription;
+            return attachment;
+        }
 
-            var message = context.MakeMessage();
+
+
+        private async Task DescribeImage(IDialogContext context, string imageBlobUrl)
+        {
+            string description = await _cognitiveServicesHelper.GetDescriptionAsync(context, imageBlobUrl);
+            List<CardAction> cardButtons = new List<CardAction>();
             
+            var message = context.MakeMessage();
+            message.Attachments.Add(await GetAttachmentDescribingImageWithAdaptiveCard(context, imageBlobUrl, description));
+
             /*
             message.Attachments = new List<Attachment>();
 
@@ -465,7 +529,6 @@ namespace Bot_HomeAutomation.Dialogs
             message.Attachments.Add(card.ToAttachment());
             */
 
-            message.Attachments.Add(attachement);
 
 
             await context.PostAsync(message);
