@@ -25,6 +25,14 @@ namespace Bot_HomeAutomation.Helpers
 
             return result;
         }
+        public async Task<string> PostDeviceElementValueAsync(IDialogContext context, string requestUri, DeviceElementValueModel control)
+        {
+            var content = JsonConvert.SerializeObject(control);
+            var response = await httpclient.PostAsync(requestUri, new StringContent(content, Encoding.UTF8, "application/json"));
+            string result = response.Content.ReadAsStringAsync().Result;
+
+            return result;
+        }
 
         public async Task<string> GetAsync(string requestUri)
         {
@@ -49,6 +57,59 @@ namespace Bot_HomeAutomation.Helpers
                 SwitchStatus = switchStatus
             };
             string result = await PostDeviceElementSwitchAsync(context, "api/deviceElement/setdeviceelementswitch", deviceElementSwitch);
+            return result;
+        }
+
+        public async Task<string> ControlDeviceValueAsync(IDialogContext context, string deviceID, ElementType elementType, double setValue)
+        {
+
+            httpclient = new HttpClient
+            {
+                BaseAddress = new Uri(_iotPlatformApiBaseAddress)
+            };
+
+            var deviceElementValue = new DeviceElementValueModel
+            {
+                DeviceId = deviceID,
+                ElementType = elementType,
+                SetValue = setValue
+            };
+            string result = await PostDeviceElementValueAsync(context, "api/deviceElement/setdeviceelementvalue", deviceElementValue);
+            return result;
+        }
+        public async Task<string> ControlDeviceValueChangeAsync(IDialogContext context, string deviceID, ElementType elementType, double setChange)
+        {
+
+            httpclient = new HttpClient
+            {
+                BaseAddress = new Uri(_iotPlatformApiBaseAddress)
+            };
+
+            //first read current status
+            DeviceModel deviceModel = await ReadDeviceStatusAsync(context, deviceID);
+            double setValue = 0.0;
+            foreach (var item in deviceModel.Elements)
+            {
+                if (item.ElementType == ElementType.Cooler)
+                    setValue = item.SetValue;
+            }
+            //TODO: Refactor: I could encapsulate this.
+
+            double newSetValue = setValue + setChange;
+            if (newSetValue < 0)
+                newSetValue = 0;
+            if (newSetValue > 100)
+                newSetValue = 100;
+
+            //then ask the device to set the value, increased/decreased by the percent given
+            var deviceElementValue = new DeviceElementValueModel
+            {
+                DeviceId = deviceID,
+                ElementType = elementType,
+                SetValue = newSetValue
+
+            };
+            string result = await PostDeviceElementValueAsync(context, "api/deviceElement/setdeviceelementvalue", deviceElementValue);
             return result;
         }
 

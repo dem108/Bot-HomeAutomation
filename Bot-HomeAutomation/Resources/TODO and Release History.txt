@@ -1,9 +1,9 @@
-﻿HIGH
-Find.Person : LUIS training and handler (where is grandpa, who is in the room)
-Value model.
-Make it warmer.
-Make it darker.
+﻿--TODO
+
+HIGH
 Re-format message results (rich cards): Welcome message, and what?
+Make it darker.
+Face API, identification?
 
 
 MEDIUM
@@ -14,3 +14,19 @@ LOW
 Check Power Consumption value: it is always 0???
 RootDialog: Add feature to show weather at user location or room location
     
+
+
+--DONE
+
+HIGH
+Find.Person : LUIS training and handler (where is grandpa, who is in the room)
+Value model.
+Make it warmer.
+
+
+MEDIUM
+
+
+LOW
+
+

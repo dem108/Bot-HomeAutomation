@@ -110,7 +110,7 @@ namespace Bot_HomeAutomation.Helpers
 
         public async Task<string> GetDescriptionAsync(IDialogContext context, string imageBlobUrl)
         {
-            string description = "default desciption";
+            string description = "(default desciption)";
             try
             {
                 description = await PostComputerVisionDescribeAsync(context, imageBlobUrl);

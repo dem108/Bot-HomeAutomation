@@ -34,7 +34,7 @@ namespace Bot_HomeAutomation.Dialogs
 
             //TODO (MEDIUM)
             //move welcome message to before authentication, when you implemented authentication
-            await context.PostAsync("Hi, I'm the GBB Home Automation bot. Let's get started.");
+            await context.PostAsync("Hi, I'm Yoda Man and here to help you with your home automation. Let's get started.");
 
             //TODO (LOW)
             //show weather at user location using adaptive card
@@ -65,18 +65,18 @@ namespace Bot_HomeAutomation.Dialogs
                     Type = "imBack",
                     Value = "Turn off the light"
                 },
-                new CardAction()
-                {
-                    Title = "Heater On",
-                    Type = "imBack",
-                    Value = "Turn on the heater"
-                },
-                new CardAction()
-                {
-                    Title = "Heater Off",
-                    Type = "imBack",
-                    Value = "Turn off the heater"
-                },
+                //new CardAction()
+                //{
+                //    Title = "Heater On",
+                //    Type = "imBack",
+                //    Value = "Turn on the heater"
+                //},
+                //new CardAction()
+                //{
+                //    Title = "Heater Off",
+                //    Type = "imBack",
+                //    Value = "Turn off the heater"
+                //},
                 new CardAction()
                 {
                     Title = "Cooler On",
@@ -106,6 +106,12 @@ namespace Bot_HomeAutomation.Dialogs
                     Title = "Check Device Status",
                     Type = "imBack",
                     Value = "Status report"
+                },
+                new CardAction()
+                {
+                    Title = "Check Room Camera",
+                    Type = "imBack",
+                    Value = "Who's in the room?"
                 }
             };
 
@@ -113,13 +119,14 @@ namespace Bot_HomeAutomation.Dialogs
             {
                 new CardImage()
                 {
-                    Url = "https://bothomeauto.blob.core.windows.net/resources/AsiaGBB.png"
+                    //Url = "https://bothomeauto.blob.core.windows.net/resources/AsiaGBB.png"
+                    Url = "https://bothomeauto.blob.core.windows.net/resources/yoda-icon.png"
                 }
             };
 
             var card = new HeroCard()
             {
-                Title = "Home Automation Bot",
+                Title = "Yoda Man Bot (Home Automation)",
                 Subtitle = "I can do things like turning on and off the light or fan, take a picture in the room etc.",
                 Images = cardImages,
                 Buttons = cardButtons
